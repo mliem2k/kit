@@ -10,6 +10,7 @@ export type SessionUser = {
   roleCd?: string | null
   outletId?: string | null
   outletCd?: string | null
+  permissions?: string[]
 }
 
 export type SessionState = {
