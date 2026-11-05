@@ -49,18 +49,18 @@ export const loginLogModels = {
 export type LoginLogTable = SQLiteTable & {
   $inferInsert: {
     id: string
-    userId: string | null
+    userId?: string | null
     username: string
     action: string
-    ipAddress: string | null
-    userAgent: string | null
-    deviceType: string | null
-    browserName: string | null
-    browserVersion: string | null
-    osName: string | null
-    osVersion: string | null
-    success: boolean
-    failReason: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    deviceType?: string | null
+    browserName?: string | null
+    browserVersion?: string | null
+    osName?: string | null
+    osVersion?: string | null
+    success?: boolean
+    failReason?: string | null
   }
   userId: SQLiteColumn
   username: SQLiteColumn
