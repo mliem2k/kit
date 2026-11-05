@@ -1,6 +1,6 @@
 {
   "name": "@mliem2k/kit",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Code shared by the mliem2k apps (erp, bms, rms, omnisell): API utilities and UI primitives, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",
@@ -38,7 +38,8 @@
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-radio-group": "^1.2.0",
     "@radix-ui/react-separator": "^1.1.0",
-    "@radix-ui/react-slot": "^1.2.0"
+    "@radix-ui/react-slot": "^1.2.0",
+    "@tanstack/react-query": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "elysia": {
@@ -91,6 +92,9 @@
     },
     "@radix-ui/react-slot": {
       "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -115,6 +119,7 @@
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-radio-group": "^1.2.0",
     "@radix-ui/react-separator": "^1.1.0",
-    "@radix-ui/react-slot": "^1.2.0"
+    "@radix-ui/react-slot": "^1.2.0",
+    "@tanstack/react-query": "^5.101.2"
   }
 }
