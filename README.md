@@ -15,16 +15,20 @@ Code that more than one of the mliem2k apps (erp, bms, rms, omnisell) needs, kep
 | `@mliem2k/kit/api/audit` | `createAuditPlugin({ extractUser, write })`, an Elysia plugin that audits mutating requests |
 | `@mliem2k/kit/api/migrate` | `runMigrationsFromEnv(folder)` for each app's `db/migrate.ts` |
 | `@mliem2k/kit/web/cn` | `cn()`, clsx plus tailwind-merge |
-| `@mliem2k/kit/web/ui/*` | shadcn style `card`, `label`, `tabs`, `toast`, `toaster` |
+| `@mliem2k/kit/web/ui/*` | shadcn style `card`, `label`, `tabs`, `toast`, `toaster`, `avatar`, `radio-group`, `separator` |
+| `@mliem2k/kit/web/ui/button` | `createButton({ sizes })`, plus the default `Button` and `buttonVariants` |
+| `@mliem2k/kit/web/components/theme-toggle` | `createThemeToggle(useTheme)` |
 | `@mliem2k/kit/web/hooks/use-toast` | The toast store the toaster reads |
 | `@mliem2k/kit/web/hooks/use-theme` | `createUseTheme(storageKey)` |
+| `@mliem2k/kit/web/auth` | `createAuthContext({ eden, logoutFlagKey })`, the session provider and `useAuth` |
+| `@mliem2k/kit/web/company` | `createCompanyContext({ apiUrl, defaultName })`, the company name/logo provider |
 
-Things that differ per app on purpose (button sizes, dialog chrome, the auth context's API client) stay in the app. A file belongs here when two apps have the same bytes, or differ only by a constant that can be a parameter.
+Things that differ per app on purpose (dialog chrome, badge palettes, erp's separate design system) stay in the app. A file belongs here when two apps have the same bytes, or differ only by a constant that can be a parameter (a size, a storage key, an API client).
 
 ## Using it in an app
 
 ```sh
-bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.1.0.tar.gz
+bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.2.0.tar.gz
 ```
 
 The tarball URL is pinned to a tag and `bun.lock` records its integrity hash, so installs need no token, no git binary and no registry (Docker images, Fly and Vercel builds included). To move to a newer version, install the newer tag's URL.
@@ -36,7 +40,7 @@ Keep each app's existing import paths working by turning the old file into a one
 export * from '@mliem2k/kit/api/ip'
 ```
 
-Projects that wire a factory do it once, next to the old file:
+Projects that wire a factory do it once, next to the old file. For a component the old file becomes the factory call:
 
 ```ts
 // apps/api/src/utils/rate-limit.ts

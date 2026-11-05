@@ -1,6 +1,6 @@
 {
   "name": "@mliem2k/kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Code shared by the mliem2k apps (erp, bms, rms, omnisell): API utilities and UI primitives, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",
@@ -8,7 +8,10 @@
     "./api/*": "./src/api/*.ts",
     "./web/cn": "./src/web/cn.ts",
     "./web/ui/*": "./src/web/ui/*.tsx",
-    "./web/hooks/*": "./src/web/hooks/*.ts"
+    "./web/components/*": "./src/web/components/*.tsx",
+    "./web/hooks/*": "./src/web/hooks/*.ts",
+    "./web/auth": "./src/web/auth.tsx",
+    "./web/company": "./src/web/company.tsx"
   },
   "files": [
     "src",
@@ -31,7 +34,11 @@
     "lucide-react": "*",
     "@radix-ui/react-label": "*",
     "@radix-ui/react-tabs": "*",
-    "@radix-ui/react-toast": "*"
+    "@radix-ui/react-toast": "*",
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-radio-group": "^1.2.0",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.2.0"
   },
   "peerDependenciesMeta": {
     "elysia": {
@@ -72,6 +79,18 @@
     },
     "@radix-ui/react-toast": {
       "optional": true
+    },
+    "@radix-ui/react-avatar": {
+      "optional": true
+    },
+    "@radix-ui/react-radio-group": {
+      "optional": true
+    },
+    "@radix-ui/react-separator": {
+      "optional": true
+    },
+    "@radix-ui/react-slot": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -92,6 +111,10 @@
     "lucide-react": "*",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
-    "@radix-ui/react-toast": "^1.2.0"
+    "@radix-ui/react-toast": "^1.2.0",
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-radio-group": "^1.2.0",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.2.0"
   }
 }
