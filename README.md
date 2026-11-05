@@ -14,8 +14,8 @@ Code that more than one of the mliem2k apps (erp, bms, rms, omnisell) needs, kep
 | `@mliem2k/kit/api/rate-limit` | `createRateLimiter({ db, rateLimits })`, a fixed window limiter in one upsert |
 | `@mliem2k/kit/api/audit` | `createAuditPlugin({ extractUser, write })`, an Elysia plugin that audits mutating requests |
 | `@mliem2k/kit/api/migrate` | `runMigrationsFromEnv(folder)` for each app's `db/migrate.ts` |
-| `@mliem2k/kit/api/roles` | `createRoleService({ db, role, notFound })` and the Elysia `roleModels` |
-| `@mliem2k/kit/api/login-logs` | `createLoginLogService({ db, loginLog })` and the Elysia `loginLogModels` |
+| `@mliem2k/kit/api/roles` | `createRoleService({ db, role, notFound })` and the Elysia `roleModels`; `db`/`role` are drizzle's own types |
+| `@mliem2k/kit/api/login-logs` | `createLoginLogService({ db, loginLog })` and the Elysia `loginLogModels`; `db`/`loginLog` are drizzle's own types |
 | `@mliem2k/kit/web/cn` | `cn()`, clsx plus tailwind-merge |
 | `@mliem2k/kit/web/ui/*` | shadcn style `card`, `label`, `tabs`, `toast`, `toaster`, `avatar`, `radio-group`, `separator` |
 | `@mliem2k/kit/web/ui/input` | `createInput({ focusClass })`, plus the default `Input` |
@@ -32,7 +32,7 @@ Things that differ per app on purpose (dialog chrome, badge palettes, erp's sepa
 ## Using it in an app
 
 ```sh
-bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.5.0.tar.gz
+bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.6.0.tar.gz
 ```
 
 The tarball URL is pinned to a tag and `bun.lock` records its integrity hash, so installs need no token, no git binary and no registry (Docker images, Fly and Vercel builds included). To move to a newer version, install the newer tag's URL.

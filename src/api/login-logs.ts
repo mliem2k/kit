@@ -1,5 +1,7 @@
-import { t } from 'elysia'
 import { and, count, desc, eq, gte, like, lte } from 'drizzle-orm'
+import type { LibSQLDatabase } from 'drizzle-orm/libsql'
+import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core'
+import { t } from 'elysia'
 import { parseUserAgent } from './user-agent'
 
 export interface LoginLog {
@@ -39,13 +41,37 @@ export const loginLogModels = {
   }),
 }
 
-export type LoginLogServiceOptions = {
-  /** Each app's Drizzle client; the kit does not own the schema. */
-  // biome-ignore lint/suspicious/noExplicitAny: boundary to each app's typed db
-  db: any
-  /** Each app's `login_log` table. */
-  // biome-ignore lint/suspicious/noExplicitAny: boundary to each app's typed table
-  loginLog: any
+/**
+ * The insert shape and the columns the filters touch. A project's own
+ * `login_log` table satisfies this structurally, so the schema stays in its
+ * own migrations and the service still gets drizzle's typing.
+ */
+export type LoginLogTable = SQLiteTable & {
+  $inferInsert: {
+    id: string
+    userId: string | null
+    username: string
+    action: string
+    ipAddress: string | null
+    userAgent: string | null
+    deviceType: string | null
+    browserName: string | null
+    browserVersion: string | null
+    osName: string | null
+    osVersion: string | null
+    success: boolean
+    failReason: string | null
+  }
+  userId: SQLiteColumn
+  username: SQLiteColumn
+  action: SQLiteColumn
+  createdDt: SQLiteColumn
+}
+
+export type LoginLogServiceOptions<TTable extends LoginLogTable> = {
+  // biome-ignore lint/suspicious/noExplicitAny: LibSQLDatabase is generic over the app's schema, which the kit cannot name
+  db: LibSQLDatabase<any>
+  loginLog: TTable
   /** Override the id source; defaults to `crypto.randomUUID()`. */
   uuid?: () => string
 }
@@ -55,11 +81,11 @@ export type LoginLogServiceOptions = {
  * attempt is recorded with the parsed user agent so the admin screen can show
  * the device without re-parsing the raw string.
  */
-export function createLoginLogService({
+export function createLoginLogService<TTable extends LoginLogTable>({
   db,
   loginLog,
   uuid = () => crypto.randomUUID(),
-}: LoginLogServiceOptions) {
+}: LoginLogServiceOptions<TTable>) {
   return {
     async createLoginLog(input: {
       userId?: string
@@ -73,24 +99,25 @@ export function createLoginLogService({
       const id = uuid()
       const parsed = parseUserAgent(input.userAgent)
 
-      const rows = await db
-        .insert(loginLog)
-        .values({
-          id,
-          userId: input.userId || null,
-          username: input.username,
-          action: input.action,
-          ipAddress: input.ipAddress || null,
-          userAgent: input.userAgent || null,
-          deviceType: parsed.deviceType,
-          browserName: parsed.browserName,
-          browserVersion: parsed.browserVersion,
-          osName: parsed.osName,
-          osVersion: parsed.osVersion,
-          success: input.success !== false,
-          failReason: input.failReason || null,
-        })
-        .returning()
+      // The table is generic here, so drizzle cannot resolve its insert type
+      // from the constraint; the app's real table supplies the columns.
+      const values = {
+        id,
+        userId: input.userId || null,
+        username: input.username,
+        action: input.action,
+        ipAddress: input.ipAddress || null,
+        userAgent: input.userAgent || null,
+        deviceType: parsed.deviceType,
+        browserName: parsed.browserName,
+        browserVersion: parsed.browserVersion,
+        osName: parsed.osName,
+        osVersion: parsed.osVersion,
+        success: input.success !== false,
+        failReason: input.failReason || null,
+      } as unknown as TTable['$inferInsert']
+
+      const rows = await db.insert(loginLog).values(values).returning()
 
       return rows[0] as unknown as LoginLog
     },
