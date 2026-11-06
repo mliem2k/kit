@@ -1,7 +1,7 @@
 // Structured security event logging.
 //
 // Emits one JSON line per event to stdout, which the platform log drain
-// (Fly.io) captures and indexes. Never log passwords, tokens, or PINs.
+// (Fly, Cloud Run) captures and indexes. Never log passwords, tokens, or PINs.
 
 export interface SecurityEvent {
   /** Dotted event name, e.g. `auth.sign_in.failure`, `rbac.denied`. */
@@ -14,6 +14,8 @@ export interface SecurityEvent {
   status?: number
   /** Account identifier (username or email) for auth events. */
   username?: string
+  /** Email identifier for apps that key accounts by email instead of username. */
+  email?: string
   /** Required role for RBAC denials. */
   requiredRole?: string
   /** Free-form context (no secrets). */
