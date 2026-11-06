@@ -1,0 +1,85 @@
+name: Deploy Cloudflare Pages
+
+# Builds one static site and uploads it to an existing Cloudflare Pages project. The caller owns the install and build
+# commands, so an Astro landing and a Vite SPA share the same self hosted runner, Bun cache and Wrangler invocation.
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: Cloudflare Pages project name
+        required: true
+        type: string
+      working_directory:
+        description: Directory that holds the package to build
+        required: false
+        type: string
+        default: "."
+      install_command:
+        description: Command that installs dependencies
+        required: false
+        type: string
+        default: "bun install --frozen-lockfile"
+      build_command:
+        description: Command that builds the static output
+        required: false
+        type: string
+        default: "bun run build"
+      output_directory:
+        description: Build output relative to the working directory
+        required: true
+        type: string
+      branch:
+        description: Pages branch, where "main" is production
+        required: false
+        type: string
+        default: main
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux-mliem]
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: b853a98a4a652cc4d36446242f3dd848
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PROJECT: ${{ inputs.project }}
+      OUTPUT: ${{ inputs.output_directory }}
+      BRANCH: ${{ inputs.branch }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      # A private bun per job: the host's ~/.bun/bin/bun is shared with every other repo's workflows and gets
+      # overwritten (1.3.14 seen), while setup-bun itself races on it. The cache file is written once and renamed atomically.
+      - name: Install Bun
+        run: |
+          set -e
+          cache="$HOME/.cache/bun-1.4.4/bun"
+          if [ ! -x "$cache" ]; then
+            mkdir -p "$(dirname "$cache")"
+            tmp="$RUNNER_TEMP/bun-install"
+            rm -rf "$tmp"; mkdir -p "$tmp"
+            curl -fsSL https://bun.sh/install | BUN_INSTALL="$tmp" bash -s "bun-v1.4.4" >/dev/null
+            chmod +x "$tmp/bin/bun"
+            cp "$tmp/bin/bun" "$cache.$$" && mv -f "$cache.$$" "$cache"
+          fi
+          mkdir -p "$RUNNER_TEMP/bun"
+          cp "$cache" "$RUNNER_TEMP/bun/bun"; chmod +x "$RUNNER_TEMP/bun/bun"
+          echo "$RUNNER_TEMP/bun" >> "$GITHUB_PATH"
+          test "$("$RUNNER_TEMP/bun/bun" --version)" = "1.4.4"
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.working_directory }}
+        run: ${{ inputs.install_command }}
+
+      - name: Build
+        working-directory: ${{ inputs.working_directory }}
+        run: ${{ inputs.build_command }}
+
+      - name: Deploy
+        working-directory: ${{ inputs.working_directory }}
+        run: npx --yes wrangler@4 pages deploy "$OUTPUT" --project-name "$PROJECT" --branch "$BRANCH"
