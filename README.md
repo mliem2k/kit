@@ -33,7 +33,7 @@ Things that differ per app on purpose (dialog chrome, badge palettes, erp's sepa
 ## Using it in an app
 
 ```sh
-bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.7.0.tar.gz
+bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.8.0.tar.gz
 ```
 
 The tarball URL is pinned to a tag and `bun.lock` records its integrity hash, so installs need no token, no git binary and no registry (Docker images, Fly and Vercel builds included). To move to a newer version, install the newer tag's URL.
