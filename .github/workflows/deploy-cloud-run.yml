@@ -1,0 +1,228 @@
+name: Deploy Cloud Run
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        description: Cloud Run service name
+        required: true
+        type: string
+      project:
+        description: GCP project
+        required: true
+        type: string
+      region:
+        description: Cloud Run / Artifact Registry region
+        required: false
+        type: string
+        default: asia-southeast1
+      repository:
+        description: Artifact Registry repository
+        required: false
+        type: string
+        default: apps
+      image_name:
+        description: Image name inside the repository
+        required: true
+        type: string
+      dockerfile:
+        description: Dockerfile path relative to the caller repo
+        required: true
+        type: string
+      context:
+        description: Docker build context relative to the caller repo
+        required: false
+        type: string
+        default: .
+      port:
+        description: Container port
+        required: true
+        type: string
+      memory:
+        description: Cloud Run memory
+        required: false
+        type: string
+        default: 512Mi
+      cpu:
+        description: Cloud Run CPU
+        required: false
+        type: string
+        default: "1"
+      max_instances:
+        description: Cloud Run max instances
+        required: false
+        type: string
+        default: "3"
+      timeout:
+        description: Cloud Run request timeout in seconds
+        required: false
+        type: string
+        default: "300"
+      runtime_service_account:
+        description: Cloud Run runtime service account email
+        required: true
+        type: string
+      health_path:
+        description: Health endpoint used for the candidate probe
+        required: false
+        type: string
+        default: /health
+      public_url:
+        description: Optional public origin to verify after promotion
+        required: false
+        type: string
+        default: ""
+      env_vars:
+        description: YAML env vars block, passed to --env-vars-file
+        required: false
+        type: string
+        default: ""
+      secrets:
+        description: Comma-separated Cloud Run secret mapping
+        required: false
+        type: string
+        default: ""
+      workload_identity_provider:
+        description: Workload Identity provider resource name
+        required: true
+        type: string
+      deploy_service_account:
+        description: Deploy service account email
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux-mliem]
+    timeout-minutes: 30
+    env:
+      SERVICE: ${{ inputs.service }}
+      PROJECT: ${{ inputs.project }}
+      REGION: ${{ inputs.region }}
+      REPOSITORY: ${{ inputs.repository }}
+      IMAGE_NAME: ${{ inputs.image_name }}
+      DOCKERFILE: ${{ inputs.dockerfile }}
+      CONTEXT: ${{ inputs.context }}
+      PORT: ${{ inputs.port }}
+      MEMORY: ${{ inputs.memory }}
+      CPU: ${{ inputs.cpu }}
+      MAX_INSTANCES: ${{ inputs.max_instances }}
+      TIMEOUT: ${{ inputs.timeout }}
+      RUNTIME_SA: ${{ inputs.runtime_service_account }}
+      HEALTH_PATH: ${{ inputs.health_path }}
+      PUBLIC_URL: ${{ inputs.public_url }}
+      ENV_VARS: ${{ inputs.env_vars }}
+      SECRETS: ${{ inputs.secrets }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ inputs.workload_identity_provider }}
+          service_account: ${{ inputs.deploy_service_account }}
+          project_id: ${{ inputs.project }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+
+      - name: Build and push image
+        id: image
+        run: |
+          set -euo pipefail
+          image="${REGION}-docker.pkg.dev/${PROJECT}/${REPOSITORY}/${IMAGE_NAME}:${GITHUB_SHA::7}"
+          docker build --pull --platform linux/amd64 -f "$DOCKERFILE" -t "$image" "$CONTEXT"
+          docker push "$image"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$image" | cut -d@ -f2)
+          test -n "$digest"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "Pushed ${image}@${digest}"
+
+      - name: Deploy candidate and promote
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+          DIGEST: ${{ steps.image.outputs.digest }}
+        run: |
+          set -euo pipefail
+
+          previous=$(gcloud run services describe "$SERVICE" \
+            --project "$PROJECT" --region "$REGION" --format=json 2>/dev/null \
+            | jq -r '[.status.traffic[] | select(.percent > 0) | "\(.revisionName)=\(.percent)"] | join(",")' || true)
+
+          envfile=$(mktemp)
+          if [ -n "$ENV_VARS" ]; then
+            printf '%s\n' "$ENV_VARS" > "$envfile"
+          fi
+
+          args=(
+            run deploy "$SERVICE"
+            --project "$PROJECT"
+            --region "$REGION"
+            --platform managed
+            --image "${IMAGE}@${DIGEST}"
+            --service-account "$RUNTIME_SA"
+            --allow-unauthenticated
+            --port "$PORT"
+            --memory "$MEMORY"
+            --cpu "$CPU"
+            --min-instances=0
+            --max-instances="$MAX_INSTANCES"
+            --timeout "$TIMEOUT"
+            --cpu-boost
+            --no-traffic
+            --tag candidate
+            --revision-suffix "gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            --quiet
+          )
+          if [ -s "$envfile" ]; then args+=(--env-vars-file "$envfile"); fi
+          if [ -n "$SECRETS" ]; then args+=(--set-secrets "$SECRETS"); fi
+
+          gcloud "${args[@]}"
+
+          revision=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.latestCreatedRevisionName)')
+          candidate=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format=json \
+            | jq -r '.status.traffic[] | select(.tag == "candidate") | .url' | head -n1)
+
+          if [ -z "$candidate" ]; then
+            echo "Cloud Run did not return a candidate URL"
+            exit 1
+          fi
+
+          echo "Probing ${candidate}${HEALTH_PATH}"
+          healthy=0
+          for _ in $(seq 1 30); do
+            if curl -fsS --max-time 10 "${candidate}${HEALTH_PATH}" >/dev/null; then healthy=1; break; fi
+            sleep 2
+          done
+
+          rollback() {
+            if [ -n "$previous" ]; then
+              gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" --to-revisions="$previous" --quiet || true
+            fi
+          }
+
+          if [ "$healthy" != "1" ]; then
+            echo "Candidate did not become healthy; keeping the current traffic"
+            rollback
+            exit 1
+          fi
+
+          gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" --to-revisions="${revision}=100" --quiet
+          gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" --remove-tags=candidate --quiet || true
+
+          if [ -n "$PUBLIC_URL" ]; then
+            echo "Verifying ${PUBLIC_URL}${HEALTH_PATH}"
+            if ! curl -fsS --max-time 20 "${PUBLIC_URL}${HEALTH_PATH}" >/dev/null; then
+              echo "Public URL verification failed; restoring previous traffic"
+              rollback
+              exit 1
+            fi
+          fi
+
+          echo "Deployed ${revision} on ${SERVICE}"
