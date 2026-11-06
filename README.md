@@ -7,11 +7,12 @@ Code that more than one of the mliem2k apps (erp, bms, rms, omnisell) needs, kep
 | Import | What it is |
 |---|---|
 | `@mliem2k/kit/api/date` | Timestamp contract for the billiard and restaurant databases: naive UTC digits in storage, tagged instants on the wire |
-| `@mliem2k/kit/api/ip` | Client IP from proxy headers |
+| `@mliem2k/kit/api/ip` | Client IP from `fly-client-ip` or the rightmost `x-forwarded-for` hop |
 | `@mliem2k/kit/api/user-agent` | Small user agent parser for login logs |
 | `@mliem2k/kit/api/password` | bcrypt and scrypt password hashing and verification, with migration from the old hash |
 | `@mliem2k/kit/api/security-log` | One JSON line per security event, for the platform log drain |
 | `@mliem2k/kit/api/rate-limit` | `createRateLimiter({ db, rateLimits })`, a fixed window limiter in one upsert |
+| `@mliem2k/kit/api/memory-rate-limit` | `createMemoryRateLimiter()`, the same fixed window for public, mostly stateless APIs |
 | `@mliem2k/kit/api/audit` | `createAuditPlugin({ extractUser, write })`, an Elysia plugin that audits mutating requests |
 | `@mliem2k/kit/api/migrate` | `runMigrationsFromEnv(folder)` for each app's `db/migrate.ts` |
 | `@mliem2k/kit/api/roles` | `createRoleService({ db, role, notFound })` and the Elysia `roleModels`; `db`/`role` are drizzle's own types |
@@ -32,7 +33,7 @@ Things that differ per app on purpose (dialog chrome, badge palettes, erp's sepa
 ## Using it in an app
 
 ```sh
-bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.6.1.tar.gz
+bun add https://github.com/mliem2k/kit/archive/refs/tags/v0.7.0.tar.gz
 ```
 
 The tarball URL is pinned to a tag and `bun.lock` records its integrity hash, so installs need no token, no git binary and no registry (Docker images, Fly and Vercel builds included). To move to a newer version, install the newer tag's URL.
