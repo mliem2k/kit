@@ -19,5 +19,6 @@ describe('getClientIp', () => {
   test('falls back to x-real-ip and then unknown', () => {
     expect(getClientIp(new Request('http://example.com', { headers: { 'x-real-ip': '2.3.4.5' } }))).toBe('2.3.4.5')
     expect(getClientIp(new Request('http://example.com'))).toBe('unknown')
+    expect(getClientIp(new Request('http://example.com'), '10.0.0.1')).toBe('10.0.0.1')
   })
 })
