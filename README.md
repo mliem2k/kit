@@ -18,7 +18,7 @@ Code that more than one of the mliem2k apps (erp, bms, rms, omnisell) needs, kep
 | `@mliem2k/kit/api/roles` | `createRoleService({ db, role, notFound })` and the Elysia `roleModels`; `db`/`role` are drizzle's own types |
 | `@mliem2k/kit/api/login-logs` | `createLoginLogService({ db, loginLog })` and the Elysia `loginLogModels`; `db`/`loginLog` are drizzle's own types |
 | `@mliem2k/kit/web/cn` | `cn()`, clsx plus tailwind-merge |
-| `@mliem2k/kit/web/ui/*` | shadcn style `card`, `label`, `tabs`, `toast`, `toaster`, `avatar`, `radio-group`, `separator` |
+| `@mliem2k/kit/web/ui/*` | shadcn style `card`, `dialog`, `label`, `tabs`, `toast`, `toaster`, `avatar`, `radio-group`, `separator` |
 | `@mliem2k/kit/web/ui/input` | `createInput({ focusClass })`, plus the default `Input` |
 | `@mliem2k/kit/web/ui/button` | `createButton({ sizes })`, plus the default `Button` and `buttonVariants` |
 | `@mliem2k/kit/web/components/theme-toggle` | `createThemeToggle(useTheme)` |
