@@ -113,6 +113,7 @@ jobs:
       MAX_INSTANCES: ${{ inputs.max_instances }}
       TIMEOUT: ${{ inputs.timeout }}
       RUNTIME_SA: ${{ inputs.runtime_service_account }}
+      DEPLOY_SA: ${{ inputs.deploy_service_account }}
       HEALTH_PATH: ${{ inputs.health_path }}
       PUBLIC_URL: ${{ inputs.public_url }}
       ENV_VARS: ${{ inputs.env_vars }}
@@ -167,7 +168,7 @@ jobs:
             --platform managed
             --image "${IMAGE}@${DIGEST}"
             --service-account "$RUNTIME_SA"
-            --allow-unauthenticated
+            --no-allow-unauthenticated
             --port "$PORT"
             --memory "$MEMORY"
             --cpu "$CPU"
@@ -194,10 +195,15 @@ jobs:
             exit 1
           fi
 
+          # The service only accepts callers with the invoker role, so the probe sends an ID token whose
+          # audience is the service URL (Cloud Run accepts that audience on tag URLs too).
+          service_url=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')
+          id_token=$(gcloud auth print-identity-token --impersonate-service-account="$DEPLOY_SA" --audiences="$service_url" --include-email)
+
           echo "Probing ${candidate}${HEALTH_PATH}"
           healthy=0
           for _ in $(seq 1 30); do
-            if curl -fsS --max-time 10 "${candidate}${HEALTH_PATH}" >/dev/null; then healthy=1; break; fi
+            if curl -fsS --max-time 10 -H "Authorization: Bearer ${id_token}" "${candidate}${HEALTH_PATH}" >/dev/null; then healthy=1; break; fi
             sleep 2
           done
 
