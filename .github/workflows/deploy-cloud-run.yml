@@ -99,6 +99,9 @@ jobs:
   deploy:
     runs-on: [self-hosted, linux-mliem]
     timeout-minutes: 30
+    concurrency:
+      group: cloud_run_${{ inputs.project }}_${{ inputs.service }}
+      cancel-in-progress: false
     env:
       SERVICE: ${{ inputs.service }}
       PROJECT: ${{ inputs.project }}
@@ -144,6 +147,24 @@ jobs:
           echo "image=$image" >> "$GITHUB_OUTPUT"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
           echo "Pushed ${image}@${digest}"
+
+      - name: Back up the image on the CI machine
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+          DIGEST: ${{ steps.image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          umask 077
+          backup_dir="$HOME/cloud_run_image_backups/$PROJECT/$SERVICE"
+          mkdir -p "$backup_dir"
+          archive="$backup_dir/${DIGEST#sha256:}.tar"
+          temporary="$(mktemp "$backup_dir/.image.XXXXXX")"
+          trap 'rm -f "$temporary"' EXIT
+          docker image save --output "$temporary" "$IMAGE"
+          tar -tf "$temporary" >/dev/null
+          mv "$temporary" "$archive"
+          sha256sum "$archive" > "$archive.sha256"
+          sha256sum --check "$archive.sha256"
 
       - name: Deploy candidate and promote
         env:
@@ -232,3 +253,13 @@ jobs:
           fi
 
           echo "Deployed ${revision} on ${SERVICE}"
+
+      - name: Remove the deployed image from Artifact Registry
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+          DIGEST: ${{ steps.image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          archive="$HOME/cloud_run_image_backups/$PROJECT/$SERVICE/${DIGEST#sha256:}.tar"
+          sha256sum --check "$archive.sha256"
+          gcloud artifacts docker images delete "${IMAGE%:*}@${DIGEST}" --delete-tags --quiet
