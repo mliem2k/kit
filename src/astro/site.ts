@@ -24,7 +24,7 @@ function withSrcAlias(alias: Alias | undefined, src: string): Alias {
 /** The kit's `.astro` files are source, so the site's Vite has to compile them rather than load them as external modules. */
 function withKit(noExternal: NoExternal | undefined): NoExternal {
   if (noExternal === true) return true
-  const kit = '@mliem2k/kit'
+  const kit = '@mliemm/kit'
   if (noExternal === undefined) return [kit]
   const list = Array.isArray(noExternal) ? noExternal : [noExternal]
   return list.includes(kit) ? list : [...list, kit]

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@mliem2k/kit",
+      "name": "@mliemm/kit",
       "devDependencies": {
         "@libsql/client": "^0.15.0",
         "@radix-ui/react-avatar": "^1.1.0",
