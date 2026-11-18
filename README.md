@@ -27,6 +27,8 @@ Code that more than one of the mliem2k apps (erp, bms, rms, omnisell) needs, kep
 | `@mliem2k/kit/web/hooks/eden` | `useEdenQuery`, `useEdenMutation` and `toError` for Eden + react-query |
 | `@mliem2k/kit/web/auth` | `createAuthContext({ eden, logoutFlagKey })`, the session provider and `useAuth` |
 | `@mliem2k/kit/web/company` | `createCompanyContext({ apiUrl, defaultName })`, the company name/logo provider |
+| `@mliem2k/kit/api/errors` | `createErrorHandler({ development, map })`, the JSON `{ error, code }` handler for Elysia APIs (registered global, so errors from every module reach it), the `NotFoundError`, `ValidationError` and `ConflictError` classes and `errorPlugin`; an app's own errors go through `map` |
+| `@mliem2k/kit/biome/app.json` | Biome base for the Bun and React apps (erp, bms, rms, invoice): git ignore, build and migration folders skipped, two space indent, line width 100, the a11y rule settings |
 | `@mliem2k/kit/astro/site` | `defineSite({ site, ... })`, an Astro config that adds the Tailwind v4 Vite plugin, the `@` alias for `<project>/src` and compiles the kit's `.astro` files; every other Astro option passes through |
 | `@mliem2k/kit/astro/Seo.astro` | `<Seo />` for the site's own `<head>`: title, description, canonical, hreflang alternates, robots, Open Graph (image details, locales), Twitter card, JSON-LD, and a slot for tags only one site needs; a `noindex` page leaves out the canonical and the alternates |
 | `@mliem2k/kit/astro/seo` | `seoTags(props)`, the data behind `<Seo />`, and `jsonForScript` |
@@ -59,6 +61,44 @@ import { db, rateLimits } from '../db/index.js'
 export type { RateLimitResult } from '@mliem2k/kit/api/rate-limit'
 export const rateLimit = createRateLimiter({ db, rateLimits })
 ```
+
+### Stack baseline
+
+The versions the apps are kept on, so a bump is a change to this table first. Grouped Dependabot updates, as `games` has, keep a repo near it.
+
+| | Version | Notes |
+|---|---|---|
+| Bun | 1.4.4 | `packageManager` and the CI `bun_version` |
+| TypeScript | ^7.0.2 | `^6.0.3` for Astro sites, where `astro check` runs on 6; TypeScript 7 has no `baseUrl` |
+| React | ^19.2.7 | with `@types/react` ^19.2.17 |
+| Vite | ^8.1 | plugin-react ^6 |
+| Tailwind | ^4.3 | |
+| Elysia / Eden | ^1.4.29 / ^1.4.9 | |
+| Drizzle | ^0.45.4 | drizzle-kit ^0.31 |
+| better-auth | ^1.6 | |
+| zod | ^4 | |
+| TanStack | Query ^5.101, Router ^1.170 | |
+| Biome | ^2.5 | extend `@mliem2k/kit/biome/app.json` or `astro/biome.json` |
+| Vitest | ^4.1 | |
+| Astro | ^7 | with Tailwind through `defineSite` |
+
+### Shared CI
+
+`.github/workflows/ci-bun.yml` is the part of a Bun repo's CI that every repo repeats (checkout, Bun, cache, frozen install); the caller passes its own commands:
+
+```yaml
+jobs:
+  ci:
+    uses: mliemm/kit/.github/workflows/ci-bun.yml@v0.13.0
+    with:
+      run: |
+        bun run typecheck
+        bun run check
+        bun run test
+      env: '{"DATABASE_URL": "file:./ci.db"}'
+```
+
+`run` and `env` come from the calling workflow, so only pass values you control.
 
 ### Astro sites
 
