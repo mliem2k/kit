@@ -27,6 +27,10 @@ Code that more than one of the mliem2k apps (erp, bms, rms, omnisell) needs, kep
 | `@mliem2k/kit/web/hooks/eden` | `useEdenQuery`, `useEdenMutation` and `toError` for Eden + react-query |
 | `@mliem2k/kit/web/auth` | `createAuthContext({ eden, logoutFlagKey })`, the session provider and `useAuth` |
 | `@mliem2k/kit/web/company` | `createCompanyContext({ apiUrl, defaultName })`, the company name/logo provider |
+| `@mliem2k/kit/astro/site` | `defineSite({ site, ... })`, an Astro config that adds the Tailwind v4 Vite plugin, the `@` alias for `<project>/src` and compiles the kit's `.astro` files; every other Astro option passes through |
+| `@mliem2k/kit/astro/Seo.astro` | `<Seo />` for the site's own `<head>`: title, description, canonical, robots, Open Graph, Twitter card, JSON-LD |
+| `@mliem2k/kit/astro/seo` | `seoTags(props)`, the data behind `<Seo />`, and `jsonForScript` |
+| `@mliem2k/kit/astro/biome.json` | Biome base for Astro sites: git ignore, `dist` and `.astro` skipped, two space indent, recommended linter, import sorting, Tailwind directives in CSS |
 
 Things that differ per app on purpose (dialog chrome, badge palettes, erp's separate design system) stay in the app. A file belongs here when two apps have the same bytes, or differ only by a constant that can be a parameter (a size, a storage key, an API client).
 
@@ -55,6 +59,34 @@ import { db, rateLimits } from '../db/index.js'
 export type { RateLimitResult } from '@mliem2k/kit/api/rate-limit'
 export const rateLimit = createRateLimiter({ db, rateLimits })
 ```
+
+### Astro sites
+
+```js
+// astro.config.mjs
+import sitemap from '@astrojs/sitemap'
+import { defineSite } from '@mliem2k/kit/astro/site'
+
+export default defineSite({ site: 'https://example.com', integrations: [sitemap()], i18n: { /* ... */ } })
+```
+
+```astro
+---
+// src/layouts/BaseLayout.astro
+import Seo from '@mliem2k/kit/astro/Seo.astro'
+---
+<head>
+  <Seo title="Home | Example" description="..." canonical={Astro.url.href} image={new URL('/og.png', Astro.site)} jsonLd={organization} />
+  <!-- icons, font preloads, manifest: the site's own -->
+</head>
+```
+
+```json
+// biome.json
+{ "extends": ["@mliem2k/kit/astro/biome.json"], "formatter": { "lineWidth": 100 }, "javascript": { "formatter": { "quoteStyle": "single" } } }
+```
+
+`astro` and `@tailwindcss/vite` are optional peers: the site installs them. Quote style, semicolons and line width are left to each site, since they differ. There is no shared `tsconfig`: `paths` and `include` in an extended config resolve from the preset's own folder, so the site keeps its small one. The deploy workflow for Cloudflare Pages is `.github/workflows/deploy-pages.yml` (see the sites' `deploy.yml`).
 
 ### Tailwind
 

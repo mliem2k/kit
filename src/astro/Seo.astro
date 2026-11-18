@@ -1,0 +1,21 @@
+---
+// Goes inside the site's own <head>. See seo.ts for the props.
+import { seoTags, type SeoProps } from './seo'
+
+type Props = SeoProps
+const tags = seoTags(Astro.props)
+---
+
+{
+  tags.map((entry) =>
+    entry.tag === 'title' ? (
+      <title>{entry.text}</title>
+    ) : entry.tag === 'meta' ? (
+      <meta {...entry.attrs} />
+    ) : entry.tag === 'link' ? (
+      <link {...entry.attrs} />
+    ) : (
+      <script type="application/ld+json" set:html={entry.json} />
+    ),
+  )
+}

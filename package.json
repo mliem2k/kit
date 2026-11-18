@@ -1,7 +1,7 @@
 {
   "name": "@mliem2k/kit",
-  "version": "0.10.0",
-  "description": "Code shared by the mliem2k apps (erp, bms, rms, omnisell): API utilities and UI primitives, shipped as TypeScript source.",
+  "version": "0.11.0",
+  "description": "Code shared by the mliem2k apps (erp, bms, rms, omnisell): API utilities, UI primitives and Astro site helpers, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -11,7 +11,11 @@
     "./web/components/*": "./src/web/components/*.tsx",
     "./web/hooks/*": "./src/web/hooks/*.ts",
     "./web/auth": "./src/web/auth.tsx",
-    "./web/company": "./src/web/company.tsx"
+    "./web/company": "./src/web/company.tsx",
+    "./astro/site": "./src/astro/site.ts",
+    "./astro/seo": "./src/astro/seo.ts",
+    "./astro/Seo.astro": "./src/astro/Seo.astro",
+    "./astro/biome.json": "./src/astro/biome.json"
   },
   "files": [
     "src",
@@ -40,7 +44,9 @@
     "@radix-ui/react-radio-group": "^1.2.0",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.2.0",
-    "@tanstack/react-query": "^5.0.0"
+    "@tanstack/react-query": "^5.0.0",
+    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0",
+    "@tailwindcss/vite": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "elysia": {
@@ -99,6 +105,12 @@
     },
     "@tanstack/react-query": {
       "optional": true
+    },
+    "astro": {
+      "optional": true
+    },
+    "@tailwindcss/vite": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -111,10 +123,12 @@
     "@radix-ui/react-slot": "^1.2.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.0",
+    "@tailwindcss/vite": "^4.3.5",
     "@tanstack/react-query": "^5.101.2",
     "@types/bun": "latest",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "astro": "^7.4.12",
     "bcryptjs": "^3.0.0",
     "better-auth": "^1.3.0",
     "class-variance-authority": "^0.7.1",
@@ -125,6 +139,10 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.0",
+    "tailwindcss": "^4.3.5",
     "typescript": "^5.6.0"
-  }
+  },
+  "keywords": [
+    "astro-component"
+  ]
 }
