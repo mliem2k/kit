@@ -28,7 +28,7 @@ Code that more than one of the mliem2k apps (erp, bms, rms, omnisell) needs, kep
 | `@mliem2k/kit/web/auth` | `createAuthContext({ eden, logoutFlagKey })`, the session provider and `useAuth` |
 | `@mliem2k/kit/web/company` | `createCompanyContext({ apiUrl, defaultName })`, the company name/logo provider |
 | `@mliem2k/kit/astro/site` | `defineSite({ site, ... })`, an Astro config that adds the Tailwind v4 Vite plugin, the `@` alias for `<project>/src` and compiles the kit's `.astro` files; every other Astro option passes through |
-| `@mliem2k/kit/astro/Seo.astro` | `<Seo />` for the site's own `<head>`: title, description, canonical, robots, Open Graph, Twitter card, JSON-LD |
+| `@mliem2k/kit/astro/Seo.astro` | `<Seo />` for the site's own `<head>`: title, description, canonical, hreflang alternates, robots, Open Graph (image details, locales), Twitter card, JSON-LD, and a slot for tags only one site needs; a `noindex` page leaves out the canonical and the alternates |
 | `@mliem2k/kit/astro/seo` | `seoTags(props)`, the data behind `<Seo />`, and `jsonForScript` |
 | `@mliem2k/kit/astro/biome.json` | Biome base for Astro sites: git ignore, `dist` and `.astro` skipped, two space indent, recommended linter, import sorting, Tailwind directives in CSS |
 

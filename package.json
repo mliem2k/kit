@@ -1,6 +1,6 @@
 {
   "name": "@mliem2k/kit",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Code shared by the mliem2k apps (erp, bms, rms, omnisell): API utilities, UI primitives and Astro site helpers, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",

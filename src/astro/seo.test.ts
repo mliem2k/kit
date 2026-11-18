@@ -65,4 +65,40 @@ describe('seoTags', () => {
     const value = { a: '<!-- x -->', b: ['</SCRIPT>', 'plain'], c: 1 }
     expect(JSON.parse(jsonForScript(value))).toEqual(value)
   })
+
+  test('hreflang alternates and the other Open Graph locales are written once each, in the order given', () => {
+    const tags = seoTags({ ...base, locale: 'id_ID', localeAlternates: ['en_US', 'zh_TW'], alternates: { id: 'https://acme.test/', en: new URL('https://acme.test/en/'), 'x-default': 'https://acme.test/' } })
+    const alternates = tags.filter((t) => t.tag === 'link' && t.attrs.rel === 'alternate').map((t) => (t.tag === 'link' ? [t.attrs.hreflang, t.attrs.href] : []))
+    expect(alternates).toEqual([['id', 'https://acme.test/'], ['en', 'https://acme.test/en/'], ['x-default', 'https://acme.test/']])
+    expect(tags.filter((t) => t.tag === 'meta' && t.attrs.property === 'og:locale:alternate').map((t) => (t.tag === 'meta' ? t.attrs.content : ''))).toEqual(['en_US', 'zh_TW'])
+  })
+
+  test('a noindex page has no canonical link and no alternates, but keeps og:url and its robots tag', () => {
+    const tags = seoTags({ ...base, noindex: true, alternates: { en: 'https://acme.test/en/' } })
+    expect(tags.some((t) => t.tag === 'link')).toBe(false)
+    expect(content(tags, 'og:url')).toBe('https://acme.test/')
+    expect(content(tags, 'robots')).toBe('noindex, follow')
+    expect(tags.some((t) => t.tag === 'link')).toBe(false)
+    // a site that writes its own robots value keeps the canonical
+    expect(seoTags({ ...base, robots: 'noindex' }).some((t) => t.tag === 'link' && t.attrs.rel === 'canonical')).toBe(true)
+  })
+
+  test('image details and the Twitter site appear only with an image, or when given', () => {
+    const tags = seoTags({ ...base, image: 'https://acme.test/og.webp', imageType: 'image/webp', imageWidth: 1024, imageHeight: 512, imageAlt: 'Acme', twitterSite: '@acme' })
+    expect(content(tags, 'og:image:type')).toBe('image/webp')
+    expect(content(tags, 'og:image:width')).toBe('1024')
+    expect(content(tags, 'og:image:height')).toBe('512')
+    expect(content(tags, 'og:image:alt')).toBe('Acme')
+    expect(content(tags, 'twitter:image:alt')).toBe('Acme')
+    expect(content(tags, 'twitter:site')).toBe('@acme')
+    const none = seoTags({ ...base, imageWidth: 1, imageAlt: 'x' })
+    for (const key of ['og:image:width', 'og:image:alt', 'twitter:image:alt', 'twitter:site']) expect(meta(none, key)).toBeUndefined()
+  })
+
+  test('without a description none of the three description tags is written', () => {
+    const tags = seoTags({ title: 'T', canonical: 'https://acme.test/' })
+    for (const key of ['description', 'og:description', 'twitter:description']) expect(meta(tags, key)).toBeUndefined()
+    expect(content(tags, 'og:title')).toBe('T')
+  })
 })
+

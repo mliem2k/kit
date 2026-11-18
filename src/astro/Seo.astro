@@ -1,5 +1,5 @@
 ---
-// Goes inside the site's own <head>. See seo.ts for the props.
+// Goes inside the site's own <head>. See seo.ts for the props; tags only one site needs go in the slot.
 import { seoTags, type SeoProps } from './seo'
 
 type Props = SeoProps
@@ -19,3 +19,4 @@ const tags = seoTags(Astro.props)
     ),
   )
 }
+<slot />
