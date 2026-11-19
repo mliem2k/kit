@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { bindMenu, bindScrolled } from './client'
+import { bindMenu, bindReveal, bindScrolled } from './client'
 
 function fakeElement() {
   const classes = new Set<string>()
@@ -78,5 +78,59 @@ describe('bindMenu', () => {
 
   test('does nothing without both elements', () => {
     expect(() => bindMenu(null, null)).not.toThrow()
+  })
+})
+
+describe('bindReveal', () => {
+  function el() {
+    const classes = new Set<string>()
+    return {
+      classes,
+      classList: { add: (...t: string[]) => t.forEach((x) => classes.add(x)), remove: (...t: string[]) => t.forEach((x) => classes.delete(x)) },
+    }
+  }
+
+  test('reduced motion shows everything at once and adds no pending class', () => {
+    const a = el()
+    a.classes.add('start')
+    bindReveal('[data-reveal]', {
+      pending: ['fade-in'],
+      revealed: ['in-view'],
+      clear: ['start'],
+      env: { reducedMotion: true, root: { querySelectorAll: () => [a] } as never },
+    })
+    expect([...a.classes]).toEqual(['in-view'])
+  })
+
+  test('reveals an element once it intersects, with one observer per threshold', () => {
+    const made: { opts: IntersectionObserverInit; cb: IntersectionObserverCallback; watched: unknown[]; dropped: unknown[] }[] = []
+    class FakeObserver {
+      watched: unknown[] = []
+      dropped: unknown[] = []
+      constructor(cb: IntersectionObserverCallback, opts: IntersectionObserverInit) {
+        made.push(Object.assign(this, { cb, opts }) as never)
+      }
+      observe(t: unknown) {
+        this.watched.push(t)
+      }
+      unobserve(t: unknown) {
+        this.dropped.push(t)
+      }
+    }
+    const a = el()
+    const b = el()
+    const c = el()
+    bindReveal('[data-fade]', {
+      pending: ['fade-in'],
+      revealed: ['in-view'],
+      threshold: (e) => ((e as unknown) === c ? 0.5 : 0.05),
+      env: { reducedMotion: false, Observer: FakeObserver as never, root: { querySelectorAll: () => [a, b, c] } as never },
+    })
+    expect(made.map((m) => m.opts.threshold)).toEqual([0.05, 0.5])
+    expect(a.classes.has('fade-in')).toBe(true)
+    made[0].cb([{ isIntersecting: true, target: a } as never, { isIntersecting: false, target: b } as never], made[0] as never)
+    expect([...a.classes]).toEqual(['fade-in', 'in-view'])
+    expect(b.classes.has('in-view')).toBe(false)
+    expect(made[0].dropped).toEqual([a])
   })
 })

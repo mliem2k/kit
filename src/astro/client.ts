@@ -60,3 +60,69 @@ export function bindMenu(
     }
   })
 }
+
+interface RevealEnv {
+  reducedMotion: boolean
+  Observer?: typeof IntersectionObserver
+  root: Pick<Document, 'querySelectorAll'>
+}
+
+/**
+ * Reveals elements as they scroll into view. Each match of `selector` gets `pending` classes (the hidden start, kept so its
+ * transition runs), then on entering the viewport gains `revealed` and loses `clear`, once. A visitor who prefers reduced motion, or a browser without IntersectionObserver, gets the
+ * revealed state at once.
+ */
+export function bindReveal(
+  selector: string,
+  {
+    pending = [],
+    revealed = [],
+    clear = [],
+    threshold = 0.05,
+    rootMargin,
+    env,
+  }: {
+    pending?: string[]
+    revealed?: string[]
+    clear?: string[]
+    /** One value, or one per element (for example read from a data attribute). */
+    threshold?: number | ((element: HTMLElement) => number)
+    rootMargin?: string
+    env?: RevealEnv
+  } = {},
+) {
+  const { reducedMotion, Observer, root } = env ?? {
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    Observer: 'IntersectionObserver' in window ? IntersectionObserver : undefined,
+    root: document,
+  }
+  const elements = Array.from(root.querySelectorAll<HTMLElement>(selector))
+  const show = (element: Element) => {
+    element.classList.remove(...clear)
+    element.classList.add(...revealed)
+  }
+  if (reducedMotion || !Observer) {
+    for (const element of elements) show(element)
+    return
+  }
+  const observers = new Map<number, IntersectionObserver>()
+  for (const element of elements) {
+    const value = typeof threshold === 'function' ? threshold(element) : threshold
+    let observer = observers.get(value)
+    if (!observer) {
+      observer = new Observer(
+        (entries, self) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue
+            show(entry.target)
+            self.unobserve(entry.target)
+          }
+        },
+        { threshold: value, rootMargin },
+      )
+      observers.set(value, observer)
+    }
+    element.classList.add(...pending)
+    observer.observe(element)
+  }
+}
