@@ -1,6 +1,6 @@
 {
   "name": "@mliemm/kit",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Code shared by the mliemm apps (erp, bms, rms, invoice, omnidesk, the games and the landing sites): API utilities, UI primitives and Astro site helpers, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",
@@ -14,6 +14,9 @@
     "./web/company": "./src/web/company.tsx",
     "./astro/site": "./src/astro/site.ts",
     "./astro/seo": "./src/astro/seo.ts",
+    "./astro/i18n": "./src/astro/i18n.ts",
+    "./astro/whatsapp": "./src/astro/whatsapp.ts",
+    "./astro/client": "./src/astro/client.ts",
     "./astro/Seo.astro": "./src/astro/Seo.astro",
     "./astro/biome.json": "./src/astro/biome.json",
     "./biome/app.json": "./src/biome/app.json"
@@ -54,7 +57,8 @@
     "@radix-ui/react-popover": "^1.1.0",
     "@radix-ui/react-select": "^2.1.0",
     "@radix-ui/react-scroll-area": "^1.2.0",
-    "@radix-ui/react-switch": "^1.1.0"
+    "@radix-ui/react-switch": "^1.1.0",
+    "intl-messageformat": "^10.0.0 || ^11.0.0 || ^12.0.0"
   },
   "peerDependenciesMeta": {
     "elysia": {
@@ -140,6 +144,9 @@
     },
     "@radix-ui/react-switch": {
       "optional": true
+    },
+    "intl-messageformat": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -176,7 +183,8 @@
     "@radix-ui/react-popover": "^1.1.0",
     "@radix-ui/react-select": "^2.1.0",
     "@radix-ui/react-scroll-area": "^1.2.0",
-    "@radix-ui/react-switch": "^1.1.0"
+    "@radix-ui/react-switch": "^1.1.0",
+    "intl-messageformat": "^12.1.5"
   },
   "keywords": [
     "astro-component"
