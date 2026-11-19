@@ -35,6 +35,10 @@ export interface SeoProps {
   twitterCard?: 'summary' | 'summary_large_image'
   /** The site's Twitter handle, `@name`. */
   twitterSite?: string
+  /** `twitter:description` when it should differ from `description`. */
+  twitterDescription?: string
+  /** Writes `twitter:url`. Off by default; Open Graph's `og:url` already covers it. */
+  twitterUrl?: boolean
   /** Search console verification tokens. */
   verification?: { google?: string }
   /** One schema.org object or several; each becomes its own script tag. */
@@ -81,8 +85,10 @@ export function seoTags(props: SeoProps): SeoTag[] {
   for (const other of props.localeAlternates ?? []) tags.push(meta({ property: 'og:locale:alternate', content: other }))
   tags.push(meta({ name: 'twitter:card', content: props.twitterCard ?? (image ? 'summary_large_image' : 'summary') }))
   if (props.twitterSite) tags.push(meta({ name: 'twitter:site', content: props.twitterSite }))
+  if (props.twitterUrl) tags.push(meta({ name: 'twitter:url', content: canonical }))
   tags.push(meta({ name: 'twitter:title', content: title }))
-  if (description !== undefined) tags.push(meta({ name: 'twitter:description', content: description }))
+  const twitterDescription = props.twitterDescription ?? description
+  if (twitterDescription !== undefined) tags.push(meta({ name: 'twitter:description', content: twitterDescription }))
   if (image) {
     tags.push(meta({ name: 'twitter:image', content: image }))
     if (imageAlt) tags.push(meta({ name: 'twitter:image:alt', content: imageAlt }))
