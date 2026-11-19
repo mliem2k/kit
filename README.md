@@ -36,6 +36,9 @@ Code that more than one of the mliemm apps (erp, bms, rms, invoice, omnidesk, th
 | `@mliemm/kit/astro/site` | `defineSite({ site, ... })`, an Astro config that adds the Tailwind v4 Vite plugin, the `@` alias for `<project>/src` and compiles the kit's `.astro` files; every other Astro option passes through |
 | `@mliemm/kit/astro/Seo.astro` | `<Seo />` for the site's own `<head>`: title, description, canonical, hreflang alternates, robots, Open Graph (image details, locales), Twitter card, JSON-LD, and a slot for tags only one site needs; a `noindex` page leaves out the canonical and the alternates |
 | `@mliemm/kit/astro/seo` | `seoTags(props)`, the data behind `<Seo />`, and `jsonForScript` |
+| `@mliemm/kit/astro/i18n` | `createI18n({ locales, defaultLocale, messages })`: ICU `translator(locale)`, `localePath`, `stripLocale`, `localeFromPath`, `alternates` |
+| `@mliemm/kit/astro/whatsapp` | `whatsappUrl(phone, text?)`, a wa.me link from a number in any format |
+| `@mliemm/kit/astro/client` | `bindMenu` and `bindScrolled` for a site's bundled scripts |
 | `@mliemm/kit/astro/biome.json` | Biome base for Astro sites: git ignore, `dist` and `.astro` skipped, two space indent, recommended linter, import sorting, Tailwind directives in CSS |
 
 Things that differ per app on purpose (dialog chrome, badge palettes, erp's separate design system) stay in the app. A file belongs here when two apps have the same bytes, or differ only by a constant that can be a parameter (a size, a storage key, an API client).
