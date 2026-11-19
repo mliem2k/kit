@@ -95,6 +95,16 @@ describe('seoTags', () => {
     for (const key of ['og:image:width', 'og:image:alt', 'twitter:image:alt', 'twitter:site']) expect(meta(none, key)).toBeUndefined()
   })
 
+  test('the Twitter description can differ and twitter:url is opt in', () => {
+    const tags = seoTags({ ...base, description: 'Long', twitterDescription: 'Short', twitterUrl: true })
+    expect(content(tags, 'description')).toBe('Long')
+    expect(content(tags, 'twitter:description')).toBe('Short')
+    expect(content(tags, 'twitter:url')).toBe(base.canonical)
+    const plain = seoTags({ ...base, description: 'Long' })
+    expect(content(plain, 'twitter:description')).toBe('Long')
+    expect(meta(plain, 'twitter:url')).toBeUndefined()
+  })
+
   test('without a description none of the three description tags is written', () => {
     const tags = seoTags({ title: 'T', canonical: 'https://acme.test/' })
     for (const key of ['description', 'og:description', 'twitter:description']) expect(meta(tags, key)).toBeUndefined()

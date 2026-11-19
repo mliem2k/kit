@@ -1,6 +1,7 @@
 'use client'
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { X } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../cn'
@@ -38,8 +39,10 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     /** A save is in flight: Escape and an outside click must not dismiss. */
     locked?: boolean
+    /** Renders the corner close button. Off by default; a header that has its own close control leaves it off. */
+    showCloseButton?: boolean
   }
->(({ className, children, locked, onEscapeKeyDown, onInteractOutside, ...props }, ref) => (
+>(({ className, children, locked, showCloseButton = false, onEscapeKeyDown, onInteractOutside, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -59,6 +62,15 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
+      {showCloseButton && (
+        <DialogPrimitive.Close
+          disabled={locked}
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-md opacity-70 transition-opacity hover:bg-muted hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40"
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      )}
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
@@ -68,6 +80,11 @@ const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
   <div className={cn('flex flex-col gap-1 border-b px-4 py-3', className)} {...props} />
 )
 DialogHeader.displayName = 'DialogHeader'
+
+const DialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn('px-4 py-3', className)} {...props} />
+)
+DialogBody.displayName = 'DialogBody'
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex justify-end gap-2 border-t px-4 py-3', className)} {...props} />
@@ -100,6 +117,7 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
