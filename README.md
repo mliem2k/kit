@@ -39,6 +39,7 @@ Code that more than one of the mliemm apps (erp, bms, rms, invoice, omnidesk, th
 | `@mliemm/kit/astro/i18n` | `createI18n({ locales, defaultLocale, messages })`: ICU `translator(locale)`, `localePath`, `stripLocale`, `localeFromPath`, `alternates` |
 | `@mliemm/kit/astro/locale-path` | `createLocalePaths({ locales, defaultLocale })`, the path rules alone, with no formatter |
 | `@mliemm/kit/astro/whatsapp` | `whatsappUrl(phone, text?)`, a wa.me link from a number in any format |
+| `@mliemm/kit/astro/google-form` | `submitGoogleForm(action, fields)`, a contact form post to a Google Form, refusing a URL that is not `formResponse` |
 | `@mliemm/kit/astro/client` | `bindMenu` and `bindScrolled` for a site's bundled scripts |
 | `@mliemm/kit/astro/biome.json` | Biome base for Astro sites: git ignore, `dist` and `.astro` skipped, two space indent, recommended linter, import sorting, Tailwind directives in CSS |
 

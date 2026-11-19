@@ -1,6 +1,6 @@
 {
   "name": "@mliemm/kit",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "Code shared by the mliemm apps (erp, bms, rms, invoice, omnidesk, the games and the landing sites): API utilities, UI primitives and Astro site helpers, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",
@@ -17,6 +17,7 @@
     "./astro/i18n": "./src/astro/i18n.ts",
     "./astro/locale-path": "./src/astro/locale-path.ts",
     "./astro/whatsapp": "./src/astro/whatsapp.ts",
+    "./astro/google-form": "./src/astro/google-form.ts",
     "./astro/client": "./src/astro/client.ts",
     "./astro/Seo.astro": "./src/astro/Seo.astro",
     "./astro/biome.json": "./src/astro/biome.json",
