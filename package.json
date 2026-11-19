@@ -1,6 +1,6 @@
 {
   "name": "@mliemm/kit",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Code shared by the mliemm apps (erp, bms, rms, invoice, omnidesk, the games and the landing sites): API utilities, UI primitives and Astro site helpers, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",
@@ -47,7 +47,12 @@
     "@radix-ui/react-slot": "^1.2.0",
     "@tanstack/react-query": "^5.0.0",
     "astro": "^5.0.0 || ^6.0.0 || ^7.0.0",
-    "@tailwindcss/vite": "^4.0.0"
+    "@tailwindcss/vite": "^4.0.0",
+    "@radix-ui/react-alert-dialog": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.0"
   },
   "peerDependenciesMeta": {
     "elysia": {
@@ -112,6 +117,21 @@
     },
     "@tailwindcss/vite": {
       "optional": true
+    },
+    "@radix-ui/react-alert-dialog": {
+      "optional": true
+    },
+    "@radix-ui/react-checkbox": {
+      "optional": true
+    },
+    "@radix-ui/react-dropdown-menu": {
+      "optional": true
+    },
+    "@radix-ui/react-popover": {
+      "optional": true
+    },
+    "@radix-ui/react-select": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -141,7 +161,12 @@
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.0",
     "tailwindcss": "^4.3.5",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "@radix-ui/react-alert-dialog": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.0"
   },
   "keywords": [
     "astro-component"
