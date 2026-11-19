@@ -18,7 +18,7 @@ Code that more than one of the mliemm apps (erp, bms, rms, invoice, omnidesk, th
 | `@mliemm/kit/api/roles` | `createRoleService({ db, role, notFound })` and the Elysia `roleModels`; `db`/`role` are drizzle's own types |
 | `@mliemm/kit/api/login-logs` | `createLoginLogService({ db, loginLog })` and the Elysia `loginLogModels`; `db`/`loginLog` are drizzle's own types |
 | `@mliemm/kit/web/cn` | `cn()`, clsx plus tailwind-merge |
-| `@mliemm/kit/web/ui/*` | shadcn style `card`, `dialog`, `label`, `tabs`, `toast`, `toaster`, `avatar`, `radio-group`, `separator` |
+| `@mliemm/kit/web/ui/*` | shadcn style `card`, `dialog`, `label`, `tabs`, `toast`, `toaster`, `avatar`, `radio-group`, `separator`, `alert-dialog`, `checkbox`, `dropdown-menu`, `popover`, `select`, `skeleton`, `table`, `textarea` |
 | `@mliemm/kit/web/ui/input` | `createInput({ focusClass })`, plus the default `Input` |
 | `@mliemm/kit/web/ui/button` | `createButton({ sizes })`, plus the default `Button` and `buttonVariants` |
 | `@mliemm/kit/web/components/theme-toggle` | `createThemeToggle(useTheme)` |
