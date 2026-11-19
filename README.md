@@ -13,6 +13,9 @@ Code that more than one of the mliemm apps (erp, bms, rms, invoice, omnidesk, th
 | `@mliemm/kit/api/security-log` | One JSON line per security event, for the platform log drain |
 | `@mliemm/kit/api/rate-limit` | `createRateLimiter({ db, rateLimits })`, a fixed window limiter in one upsert |
 | `@mliemm/kit/api/memory-rate-limit` | `createMemoryRateLimiter()`, the same fixed window for public, mostly stateless APIs |
+| `@mliemm/kit/api/ttl-cache` | `createTtlCache()`, an in-process cache with a time to live |
+| `@mliemm/kit/api/shutdown` | `createShutdown()`, a graceful stop for an Elysia server on SIGTERM |
+| `@mliemm/kit/api/json-console` | `installJsonConsole()`, one JSON line per console call so Cloud Run reads the severity |
 | `@mliemm/kit/api/audit` | `createAuditPlugin({ extractUser, write })`, an Elysia plugin that audits mutating requests |
 | `@mliemm/kit/api/migrate` | `runMigrationsFromEnv(folder)` for each app's `db/migrate.ts` |
 | `@mliemm/kit/api/roles` | `createRoleService({ db, role, notFound })` and the Elysia `roleModels`; `db`/`role` are drizzle's own types |
