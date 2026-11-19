@@ -1,6 +1,6 @@
 {
   "name": "@mliemm/kit",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Code shared by the mliemm apps (erp, bms, rms, invoice, omnidesk, the games and the landing sites): API utilities, UI primitives and Astro site helpers, shipped as TypeScript source.",
   "license": "MIT",
   "type": "module",

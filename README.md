@@ -40,7 +40,7 @@ Code that more than one of the mliemm apps (erp, bms, rms, invoice, omnidesk, th
 | `@mliemm/kit/astro/locale-path` | `createLocalePaths({ locales, defaultLocale })`, the path rules alone, with no formatter |
 | `@mliemm/kit/astro/whatsapp` | `whatsappUrl(phone, text?)`, a wa.me link from a number in any format |
 | `@mliemm/kit/astro/google-form` | `submitGoogleForm(action, fields)`, a contact form post to a Google Form, refusing a URL that is not `formResponse` |
-| `@mliemm/kit/astro/client` | `bindMenu` and `bindScrolled` for a site's bundled scripts |
+| `@mliemm/kit/astro/client` | `bindMenu`, `bindScrolled` and `bindReveal` (scroll reveal that respects reduced motion) for a site's bundled scripts |
 | `@mliemm/kit/astro/biome.json` | Biome base for Astro sites: git ignore, `dist` and `.astro` skipped, two space indent, recommended linter, import sorting, Tailwind directives in CSS |
 
 Things that differ per app on purpose (dialog chrome, badge palettes, erp's separate design system) stay in the app. A file belongs here when two apps have the same bytes, or differ only by a constant that can be a parameter (a size, a storage key, an API client).
