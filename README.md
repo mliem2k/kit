@@ -37,6 +37,7 @@ Code that more than one of the mliemm apps (erp, bms, rms, invoice, omnidesk, th
 | `@mliemm/kit/astro/Seo.astro` | `<Seo />` for the site's own `<head>`: title, description, canonical, hreflang alternates, robots, Open Graph (image details, locales), Twitter card, JSON-LD, and a slot for tags only one site needs; a `noindex` page leaves out the canonical and the alternates |
 | `@mliemm/kit/astro/seo` | `seoTags(props)`, the data behind `<Seo />`, and `jsonForScript` |
 | `@mliemm/kit/astro/i18n` | `createI18n({ locales, defaultLocale, messages })`: ICU `translator(locale)`, `localePath`, `stripLocale`, `localeFromPath`, `alternates` |
+| `@mliemm/kit/astro/locale-path` | `createLocalePaths({ locales, defaultLocale })`, the path rules alone, with no formatter |
 | `@mliemm/kit/astro/whatsapp` | `whatsappUrl(phone, text?)`, a wa.me link from a number in any format |
 | `@mliemm/kit/astro/client` | `bindMenu` and `bindScrolled` for a site's bundled scripts |
 | `@mliemm/kit/astro/biome.json` | Biome base for Astro sites: git ignore, `dist` and `.astro` skipped, two space indent, recommended linter, import sorting, Tailwind directives in CSS |
